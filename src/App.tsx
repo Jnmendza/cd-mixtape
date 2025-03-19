@@ -1,19 +1,36 @@
 import React, { useState, useRef } from "react";
 import YouTube, { YouTubeProps, YouTubePlayer } from "react-youtube";
-import "./App.css";
+import "98.css";
+import GuiContainer from "./components/GuiContainer";
+import TableView from "./components/TableView";
+
+const MAX_LINKS = 5; // Constant for max number of inputs
 
 const App: React.FC = () => {
-  const [links, setLinks] = useState<string[]>(["", "", "", "", ""]);
-  const [cdTitle, setCdTitle] = useState<string>("My Mixtape");
+  const [links, setLinks] = useState<string[]>([""]); // Start with one empty input
+  const [cdTitle, setCdTitle] = useState<string>("My CDs Title");
   const [currentTrack, setCurrentTrack] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPlayer, setShowPlayer] = useState<boolean>(false);
   const playerRef = useRef<YouTubePlayer | null>(null);
 
+  const trackCount = `${links.length}/${MAX_LINKS}`;
+
   const handleLinkChange = (index: number, value: string) => {
     const newLinks = [...links];
     newLinks[index] = value;
     setLinks(newLinks);
+  };
+
+  const addLinkInput = () => {
+    if (links.length < MAX_LINKS && links[links.length - 1].trim() !== "") {
+      setLinks([...links, ""]);
+    }
+  };
+
+  const removeLinkInput = (index: number) => {
+    const newLinks = links.filter((_, i) => i !== index);
+    setLinks(newLinks.length === 0 ? [""] : newLinks);
   };
 
   const getVideoId = (url: string): string => {
@@ -36,7 +53,6 @@ const App: React.FC = () => {
     }
     const playerState = playerRef.current.getPlayerState();
     if (playerState === 1) {
-      // Playing
       playerRef.current.pauseVideo();
       setIsPlaying(false);
     } else {
@@ -51,7 +67,7 @@ const App: React.FC = () => {
     setCurrentTrack(nextIndex);
     if (playerRef.current) {
       const nextVideoId = getVideoId(links[nextIndex]);
-      playerRef.current.loadVideoById(nextVideoId); // Load and play immediately
+      playerRef.current.loadVideoById(nextVideoId);
       setIsPlaying(true);
     } else {
       console.log("Player not ready for next track");
@@ -75,22 +91,19 @@ const App: React.FC = () => {
     playerRef.current = event.target;
     const initialVideoId = getVideoId(links[currentTrack]);
     if (initialVideoId) {
-      event.target.cueVideoById(initialVideoId); // Queue first track on load
+      event.target.cueVideoById(initialVideoId);
     }
   };
 
   const onStateChange = (event: { target: YouTubePlayer; data: number }) => {
     const state = event.data;
-    console.log("Player state:", state); // Debug player state
+    console.log("Player state:", state);
     if (state === 0) {
-      // Ended
       console.log("Track ended, moving to next");
       nextTrack();
     } else if (state === 1) {
-      // Playing
       setIsPlaying(true);
     } else if (state === 2) {
-      // Paused
       setIsPlaying(false);
     }
   };
@@ -104,13 +117,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 flex items-center justify-center p-4'>
-      <div className='bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full'>
+    <div>
+      <GuiContainer>
         {!showPlayer ? (
-          <div className='space-y-4'>
-            <h1 className='text-2xl text-white font-bold text-center'>
-              Burn Your CD
-            </h1>
+          <div>
             <input
               type='text'
               value={cdTitle}
@@ -118,20 +128,29 @@ const App: React.FC = () => {
                 setCdTitle(e.target.value)
               }
               placeholder='CD Title'
-              className='w-full p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-indigo-500'
             />
             {links.map((link, index) => (
-              <input
-                key={index}
-                type='text'
-                value={link}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleLinkChange(index, e.target.value)
-                }
-                placeholder={`Track ${index + 1} YouTube Link`}
-                className='w-full p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-indigo-500'
-              />
+              <div key={index} className='flex space-x-2'>
+                <input
+                  type='text'
+                  value={link}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handleLinkChange(index, e.target.value)
+                  }
+                  placeholder={`Track ${index + 1} YouTube Link`}
+                />
+                <button onClick={() => removeLinkInput(index)}>-</button>
+              </div>
             ))}
+            {links.length < MAX_LINKS && (
+              <button
+                onClick={addLinkInput}
+                disabled={links[links.length - 1].trim() === ""}
+                className='w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition flex items-center justify-center'
+              >
+                + Add New Link
+              </button>
+            )}
             <button
               onClick={burnCD}
               className='w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition'
@@ -151,6 +170,7 @@ const App: React.FC = () => {
               </div>
               <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-30 rounded-full animate-spin-slow'></div>
             </div>
+            <TableView />
             <ul className='text-white text-sm'>
               {links
                 .filter((l) => l)
@@ -198,7 +218,7 @@ const App: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
+      </GuiContainer>
     </div>
   );
 };
