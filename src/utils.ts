@@ -13,3 +13,13 @@ export const youtubeRegex =
 export const isValidYouTubeLink = (url: string): boolean => {
   return youtubeRegex.test(url); // Returns true if it matches
 };
+
+export const formatTime = (time: number): string => {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+
+  // Ensure two-digit seconds formatting (e.g., 3:02 instead of 3:2)
+  const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+  return minutes > 0 ? `${minutes}:${formattedSeconds}` : `00:${seconds}`;
+};
