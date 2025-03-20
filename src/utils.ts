@@ -6,3 +6,10 @@ export const getCurrentTime = (): string => {
     hour12: true, // Set to false for 24-hour format
   });
 };
+
+export const youtubeRegex =
+  /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+
+export const isValidYouTubeLink = (url: string): boolean => {
+  return youtubeRegex.test(url); // Returns true if it matches
+};
