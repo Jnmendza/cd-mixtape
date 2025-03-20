@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import YouTube, { YouTubeProps, YouTubePlayer } from "react-youtube";
 import "98.css";
 import GuiContainer from "./components/GuiContainer";
@@ -6,6 +6,7 @@ import TableViewTrackList from "./components/TableViewTrackList";
 import TableViewLinkList from "./components/TableViewLinkList";
 import ProgressIndicator from "./components/ProgressIndicator";
 import Footer from "./components/Footer";
+import { isValidYouTubeLink, youtubeRegex } from "./utils";
 
 const MAX_LINKS = 5; // Constant for max number of inputs
 
@@ -22,14 +23,6 @@ const App: React.FC = () => {
   const playerRef = useRef<YouTubePlayer | null>(null);
 
   const trackCount = `${links.length}/${MAX_LINKS}`;
-
-  // Regex for YouTube validation (same as getVideoId)
-  const youtubeRegex =
-    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
-
-  const isValidYouTubeLink = (url: string): boolean => {
-    return youtubeRegex.test(url); // Returns true if it matches
-  };
 
   const handleAddLink = () => {
     if (isValidYouTubeLink(newLink) && links.length < MAX_LINKS) {
@@ -206,7 +199,7 @@ const App: React.FC = () => {
           </div>
         ) : (
           <div>
-            <h1>{cdTitle}</h1>
+            <h4>{cdTitle}</h4>
             <div>
               <div>
                 <span>{cdTitle}</span>

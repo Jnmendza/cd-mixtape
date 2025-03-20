@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { getCurrentTime } from "../utils";
 import VerticalSeparator from "./VerticalSeparator";
+import HelpWindow from "./HelpWindow";
 
 interface FooterProps {
   showVolumeSlider: boolean;
@@ -15,6 +16,20 @@ const Footer: React.FC<FooterProps> = ({
   handleVolumeChange,
   setShowVolumeSlider,
 }) => {
+  const [showHelp, setshowHelp] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F1") {
+        e.preventDefault();
+        setshowHelp(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <footer
       style={{
@@ -41,6 +56,7 @@ const Footer: React.FC<FooterProps> = ({
         {/* Left-aligned content */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <p className='status-bar-field'>Press F1 for help</p>
+          {showHelp && <HelpWindow onClose={() => setshowHelp(false)} />}
           <VerticalSeparator />
           <p className='status-bar-field'>Slide 1</p>
         </div>
