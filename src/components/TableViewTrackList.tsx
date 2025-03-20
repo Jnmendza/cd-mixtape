@@ -17,7 +17,7 @@ const data: TableRow[] = [
   },
 ];
 
-const TableView = () => {
+const TableViewTrackList = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const handleRowClick = (index: number) => {
@@ -57,4 +57,4 @@ const TableView = () => {
   );
 };
 
-export default TableView;
+export default TableViewTrackList;
