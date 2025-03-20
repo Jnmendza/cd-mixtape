@@ -1,31 +1,60 @@
 import React, { useState, useRef } from "react";
 import YouTube, { YouTubeProps, YouTubePlayer } from "react-youtube";
-import "./App.css";
+import "98.css";
+import GuiContainer from "./components/GuiContainer";
+import TableViewTrackList from "./components/TableViewTrackList";
+import TableViewLinkList from "./components/TableViewLinkList";
+import ProgressIndicator from "./components/ProgressIndicator";
+import Footer from "./components/Footer";
+
+const MAX_LINKS = 5; // Constant for max number of inputs
 
 const App: React.FC = () => {
-  const [links, setLinks] = useState<string[]>(["", "", "", "", ""]);
-  const [cdTitle, setCdTitle] = useState<string>("My Mixtape");
+  const [links, setLinks] = useState<string[]>([]);
+  const [cdTitle, setCdTitle] = useState<string>("My CDs Title");
+  const [newLink, setNewLink] = useState<string>("");
   const [currentTrack, setCurrentTrack] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPlayer, setShowPlayer] = useState<boolean>(false);
+  const [startProgress, setStartProgress] = useState<boolean>(false);
+  const [volume, setVolume] = useState(100);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const playerRef = useRef<YouTubePlayer | null>(null);
 
-  const handleLinkChange = (index: number, value: string) => {
-    const newLinks = [...links];
-    newLinks[index] = value;
+  const trackCount = `${links.length}/${MAX_LINKS}`;
+
+  // Regex for YouTube validation (same as getVideoId)
+  const youtubeRegex =
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
+
+  const isValidYouTubeLink = (url: string): boolean => {
+    return youtubeRegex.test(url); // Returns true if it matches
+  };
+
+  const handleAddLink = () => {
+    if (isValidYouTubeLink(newLink) && links.length < MAX_LINKS) {
+      setLinks([...links, newLink]);
+      setNewLink(""); // Clear input after adding
+    } else if (!isValidYouTubeLink(newLink)) {
+      console.log("Invalid YouTube link"); // Optional: Replace with UI feedback
+    }
+  };
+
+  const handleDeleteLink = (index: number) => {
+    const newLinks = links.filter((_, i) => i !== index);
     setLinks(newLinks);
   };
 
   const getVideoId = (url: string): string => {
-    const regex =
-      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/;
-    return url.match(regex)?.[1] || "";
+    const match = url.match(youtubeRegex);
+    return match ? match[1] : "";
   };
 
   const burnCD = () => {
     if (links.some((link) => link.trim() !== "")) {
       setShowPlayer(true);
       setIsPlaying(false);
+      console.log("CD Burn complete");
     }
   };
 
@@ -36,7 +65,6 @@ const App: React.FC = () => {
     }
     const playerState = playerRef.current.getPlayerState();
     if (playerState === 1) {
-      // Playing
       playerRef.current.pauseVideo();
       setIsPlaying(false);
     } else {
@@ -51,7 +79,7 @@ const App: React.FC = () => {
     setCurrentTrack(nextIndex);
     if (playerRef.current) {
       const nextVideoId = getVideoId(links[nextIndex]);
-      playerRef.current.loadVideoById(nextVideoId); // Load and play immediately
+      playerRef.current.loadVideoById(nextVideoId);
       setIsPlaying(true);
     } else {
       console.log("Player not ready for next track");
@@ -75,23 +103,28 @@ const App: React.FC = () => {
     playerRef.current = event.target;
     const initialVideoId = getVideoId(links[currentTrack]);
     if (initialVideoId) {
-      event.target.cueVideoById(initialVideoId); // Queue first track on load
+      event.target.cueVideoById(initialVideoId);
     }
   };
 
   const onStateChange = (event: { target: YouTubePlayer; data: number }) => {
     const state = event.data;
-    console.log("Player state:", state); // Debug player state
+    console.log("Player state:", state);
     if (state === 0) {
-      // Ended
       console.log("Track ended, moving to next");
       nextTrack();
     } else if (state === 1) {
-      // Playing
       setIsPlaying(true);
     } else if (state === 2) {
-      // Paused
       setIsPlaying(false);
+    }
+  };
+
+  const handleVolumeChange = (value: number) => {
+    setVolume(value); // Update React state
+
+    if (playerRef.current) {
+      playerRef.current.setVolume(value); // Update YouTube player volume
     }
   };
 
@@ -104,13 +137,20 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 flex items-center justify-center p-4'>
-      <div className='bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg w-full'>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        paddingBottom: "30px",
+      }}
+    >
+      <GuiContainer>
         {!showPlayer ? (
-          <div className='space-y-4'>
-            <h1 className='text-2xl text-white font-bold text-center'>
-              Burn Your CD
-            </h1>
+          <div>
+            <h4>Burn Your CD</h4>
             <input
               type='text'
               value={cdTitle}
@@ -118,40 +158,61 @@ const App: React.FC = () => {
                 setCdTitle(e.target.value)
               }
               placeholder='CD Title'
-              className='w-full p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-indigo-500'
             />
-            {links.map((link, index) => (
-              <input
-                key={index}
-                type='text'
-                value={link}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleLinkChange(index, e.target.value)
-                }
-                placeholder={`Track ${index + 1} YouTube Link`}
-                className='w-full p-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-indigo-500'
-              />
-            ))}
-            <button
-              onClick={burnCD}
-              className='w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition'
+            <h4>{trackCount}</h4>
+            <TableViewLinkList links={links} onDelete={handleDeleteLink} />
+            <div
+              style={{
+                width: 350,
+                marginTop: 8,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
             >
-              Burn CD
-            </button>
+              <input
+                type='text'
+                value={newLink}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setNewLink(e.target.value)
+                }
+                placeholder='YouTube Link'
+                style={{ width: 250 }}
+              />
+              <button
+                onClick={handleAddLink}
+                disabled={newLink.trim() === "" || links.length >= MAX_LINKS}
+              >
+                Add Link
+              </button>
+            </div>
+            <div
+              style={{
+                width: 435,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 10,
+              }}
+            >
+              <ProgressIndicator start={startProgress} onComplete={burnCD} />
+              <button
+                onClick={() => setStartProgress(true)}
+                disabled={startProgress}
+                style={{ marginLeft: 10 }}
+              >
+                Burn CD
+              </button>
+            </div>
           </div>
         ) : (
-          <div className='space-y-4'>
-            <h1 className='text-2xl text-white font-bold text-center'>
-              {cdTitle}
-            </h1>
-            <div className='relative w-48 h-48 mx-auto'>
-              <div className='absolute inset-0 bg-gradient-to-br from-gray-300 via-gray-100 to-gray-400 rounded-full shadow-inner'></div>
-              <div className='absolute inset-4 bg-gray-900 rounded-full flex items-center justify-center'>
-                <span className='text-white text-sm font-mono'>{cdTitle}</span>
+          <div>
+            <h1>{cdTitle}</h1>
+            <div>
+              <div>
+                <span>{cdTitle}</span>
               </div>
-              <div className='absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-30 rounded-full animate-spin-slow'></div>
             </div>
-            <ul className='text-white text-sm'>
+            <ul>
               {links
                 .filter((l) => l)
                 .map((link, index) => (
@@ -165,25 +226,10 @@ const App: React.FC = () => {
                   </li>
                 ))}
             </ul>
-            <div className='flex justify-center space-x-4'>
-              <button
-                onClick={prevTrack}
-                className='text-white hover:text-indigo-400'
-              >
-                ⏪
-              </button>
-              <button
-                onClick={playPause}
-                className='text-white hover:text-indigo-400'
-              >
-                {isPlaying ? "⏸" : "▶"}
-              </button>
-              <button
-                onClick={nextTrack}
-                className='text-white hover:text-indigo-400'
-              >
-                ⏩
-              </button>
+            <div>
+              <button onClick={prevTrack}>⏪</button>
+              <button onClick={playPause}>{isPlaying ? "⏸" : "▶"}</button>
+              <button onClick={nextTrack}>⏩</button>
             </div>
             <YouTube
               opts={opts}
@@ -191,14 +237,22 @@ const App: React.FC = () => {
               onStateChange={onStateChange}
             />
             <button
-              onClick={() => setShowPlayer(false)}
-              className='w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition'
+              onClick={() => {
+                setShowPlayer(false);
+                setStartProgress(false);
+              }}
             >
               Edit Tracks
             </button>
           </div>
         )}
-      </div>
+      </GuiContainer>
+      <Footer
+        showVolumeSlider={showVolumeSlider}
+        volume={volume}
+        handleVolumeChange={handleVolumeChange}
+        setShowVolumeSlider={setShowVolumeSlider}
+      />
     </div>
   );
 };
