@@ -10,13 +10,15 @@ import Footer from "./components/Footer";
 const MAX_LINKS = 5; // Constant for max number of inputs
 
 const App: React.FC = () => {
-  const [links, setLinks] = useState<string[]>([]); // Start with one empty input
+  const [links, setLinks] = useState<string[]>([]);
   const [cdTitle, setCdTitle] = useState<string>("My CDs Title");
   const [newLink, setNewLink] = useState<string>("");
   const [currentTrack, setCurrentTrack] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPlayer, setShowPlayer] = useState<boolean>(false);
   const [startProgress, setStartProgress] = useState<boolean>(false);
+  const [volume, setVolume] = useState(100);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const playerRef = useRef<YouTubePlayer | null>(null);
 
   const trackCount = `${links.length}/${MAX_LINKS}`;
@@ -118,6 +120,14 @@ const App: React.FC = () => {
     }
   };
 
+  const handleVolumeChange = (value: number) => {
+    setVolume(value); // Update React state
+
+    if (playerRef.current) {
+      playerRef.current.setVolume(value); // Update YouTube player volume
+    }
+  };
+
   const opts: YouTubeProps["opts"] = {
     height: "0",
     width: "0",
@@ -149,7 +159,7 @@ const App: React.FC = () => {
               }
               placeholder='CD Title'
             />
-            <h4>{`${links.length}/${MAX_LINKS}`}</h4>
+            <h4>{trackCount}</h4>
             <TableViewLinkList links={links} onDelete={handleDeleteLink} />
             <div
               style={{
@@ -237,7 +247,12 @@ const App: React.FC = () => {
           </div>
         )}
       </GuiContainer>
-      <Footer />
+      <Footer
+        showVolumeSlider={showVolumeSlider}
+        volume={volume}
+        handleVolumeChange={handleVolumeChange}
+        setShowVolumeSlider={setShowVolumeSlider}
+      />
     </div>
   );
 };
