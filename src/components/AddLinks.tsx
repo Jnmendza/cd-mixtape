@@ -5,16 +5,16 @@ import { MAX_LINKS } from "../constants";
 import { isValidYouTubeLink } from "../utils";
 
 interface AddLinksProps {
-  cdTitle: string;
-  setCdTitle: React.Dispatch<React.SetStateAction<string>>;
   links: string[];
-  setLinks: React.Dispatch<React.SetStateAction<string[]>>;
+  cdTitle: string;
   newLink: string;
-  setNewLink: React.Dispatch<React.SetStateAction<string>>;
   startProgress: boolean;
-  setStartProgress: React.Dispatch<React.SetStateAction<boolean>>;
+  setCdTitle: React.Dispatch<React.SetStateAction<string>>;
+  setLinks: React.Dispatch<React.SetStateAction<string[]>>;
+  setNewLink: React.Dispatch<React.SetStateAction<string>>;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPlayer: React.Dispatch<React.SetStateAction<boolean>>;
+  setStartProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AddLinks = ({

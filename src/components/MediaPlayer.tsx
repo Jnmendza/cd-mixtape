@@ -30,7 +30,7 @@ const MediaPlayer = ({
   const [duration, setDuration] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
-  console.log("DATA", { videoTitle, duration, currentTime });
+
   const opts: YouTubeProps["opts"] = {
     height: "0",
     width: "0",
@@ -149,11 +149,7 @@ const MediaPlayer = ({
   return (
     <div>
       <h4>{cdTitle}</h4>
-      <div>
-        <div>
-          <span>{cdTitle}</span>
-        </div>
-      </div>
+
       <div>
         <p>
           <strong>Now Playing:</strong>{" "}
