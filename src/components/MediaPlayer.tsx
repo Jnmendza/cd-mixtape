@@ -148,8 +148,6 @@ const MediaPlayer = ({
 
   return (
     <div>
-      <h4>{cdTitle}</h4>
-
       <div>
         <p>
           <strong>Now Playing:</strong>{" "}

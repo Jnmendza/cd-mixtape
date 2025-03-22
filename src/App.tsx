@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import AddLinks from "./components/AddLinks";
 import MediaPlayer from "./components/MediaPlayer";
 import { AnimatePresence, motion } from "motion/react";
+import CdPlayerShell from "./components/CdPlayer";
 
 const App: React.FC = () => {
   // Strings
@@ -117,6 +118,9 @@ const App: React.FC = () => {
           </div>
         ) : null}
       </AnimatePresence>
+      <div>
+        <CdPlayerShell />
+      </div>
       <Footer
         volume={volume}
         showVolumeSlider={showVolumeSlider}
