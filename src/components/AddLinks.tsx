@@ -30,8 +30,6 @@ const AddLinks = ({
   setShowPlayer,
   setStartProgress,
 }: AddLinksProps) => {
-  const trackCount = `${links.length}/${MAX_LINKS}`;
-
   const handleDeleteLink = (index: number) => {
     const newLinks = links.filter((_, i) => i !== index);
     setLinks(newLinks);
@@ -61,7 +59,7 @@ const AddLinks = ({
         alt='burn-your-cd'
         style={{ height: 250, width: 475, marginBottom: 10 }}
       />
-      {/* 
+
       <input
         type='text'
         value={cdTitle}
@@ -69,7 +67,8 @@ const AddLinks = ({
           setCdTitle(e.target.value)
         }
         placeholder='CD Title'
-      /> */}
+      />
+
       <TableViewLinkList links={links} onDelete={handleDeleteLink} />
       <div
         style={{

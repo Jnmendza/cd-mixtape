@@ -4,14 +4,13 @@ import "98.css";
 import GuiContainer from "./components/GuiContainer";
 import Footer from "./components/Footer";
 import AddLinks from "./components/AddLinks";
-import MediaPlayer from "./components/MediaPlayer";
 import { AnimatePresence, motion } from "motion/react";
-import CdPlayerShell from "./components/CdPlayer";
+import CdPlayer from "./components/CdPlayer";
 
 const App: React.FC = () => {
   // Strings
   const [links, setLinks] = useState<string[]>([]);
-  const [cdTitle, setCdTitle] = useState<string>("My CDs Title");
+  const [cdTitle, setCdTitle] = useState<string>("");
   const [newLink, setNewLink] = useState<string>("");
 
   // Booleans
@@ -87,8 +86,8 @@ const App: React.FC = () => {
               justifyContent: "center",
             }}
           >
-            <GuiContainer setIsVisible={setIsVisible}>
-              {!showPlayer ? (
+            {!showPlayer ? (
+              <GuiContainer setIsVisible={setIsVisible}>
                 <AddLinks
                   links={links}
                   newLink={newLink}
@@ -101,26 +100,23 @@ const App: React.FC = () => {
                   setShowPlayer={setShowPlayer}
                   setStartProgress={setStartProgress}
                 />
-              ) : (
-                <MediaPlayer
-                  links={links}
-                  cdTitle={cdTitle}
-                  playerRef={playerRef}
-                  isPlaying={isPlaying}
-                  currentTrack={currentTrack}
-                  setIsPlaying={setIsPlaying}
-                  setShowPlayer={setShowPlayer}
-                  setCurrentTrack={setCurrentTrack}
-                  setStartProgress={setStartProgress}
-                />
-              )}
-            </GuiContainer>
+              </GuiContainer>
+            ) : (
+              <CdPlayer
+                links={links}
+                cdTitle={cdTitle}
+                playerRef={playerRef}
+                isPlaying={isPlaying}
+                currentTrack={currentTrack}
+                setIsPlaying={setIsPlaying}
+                setShowPlayer={setShowPlayer}
+                setCurrentTrack={setCurrentTrack}
+                setStartProgress={setStartProgress}
+              />
+            )}
           </div>
         ) : null}
       </AnimatePresence>
-      <div>
-        <CdPlayerShell />
-      </div>
       <Footer
         volume={volume}
         showVolumeSlider={showVolumeSlider}

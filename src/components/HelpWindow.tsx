@@ -22,6 +22,7 @@ const HelpWindow = ({ onClose }: { onClose: () => void }) => {
       {/* Window Body */}
       <div className='window-body'>
         <ul>
+          <li>Open the Media Player</li>
           <li>Add YouTube links</li>
           <li>Burn your CD</li>
           <li>Right click on the speaker icon at the bottom of the screen</li>
