@@ -3,31 +3,32 @@ import ProgressIndicator from "./ProgressIndicator";
 import TableViewLinkList from "./TableViewLinkList";
 import { MAX_LINKS } from "../constants";
 import { isValidYouTubeLink } from "../utils";
+import HorizontalSeparator from "./HorizontalSeparator";
 
 interface AddLinksProps {
-  cdTitle: string;
-  setCdTitle: React.Dispatch<React.SetStateAction<string>>;
   links: string[];
-  setLinks: React.Dispatch<React.SetStateAction<string[]>>;
+  cdTitle: string;
   newLink: string;
-  setNewLink: React.Dispatch<React.SetStateAction<string>>;
   startProgress: boolean;
-  setStartProgress: React.Dispatch<React.SetStateAction<boolean>>;
+  setCdTitle: React.Dispatch<React.SetStateAction<string>>;
+  setLinks: React.Dispatch<React.SetStateAction<string[]>>;
+  setNewLink: React.Dispatch<React.SetStateAction<string>>;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPlayer: React.Dispatch<React.SetStateAction<boolean>>;
+  setStartProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AddLinks = ({
-  cdTitle,
-  setCdTitle,
   links,
-  setLinks,
+  cdTitle,
   newLink,
-  setNewLink,
   startProgress,
-  setStartProgress,
+  setLinks,
+  setCdTitle,
+  setNewLink,
   setIsPlaying,
   setShowPlayer,
+  setStartProgress,
 }: AddLinksProps) => {
   const trackCount = `${links.length}/${MAX_LINKS}`;
 
@@ -55,7 +56,12 @@ const AddLinks = ({
 
   return (
     <div>
-      <h4>Burn Your CD</h4>
+      <img
+        src='/banner.jpg'
+        alt='burn-your-cd'
+        style={{ height: 250, width: 475, marginBottom: 10 }}
+      />
+      {/* 
       <input
         type='text'
         value={cdTitle}
@@ -63,8 +69,7 @@ const AddLinks = ({
           setCdTitle(e.target.value)
         }
         placeholder='CD Title'
-      />
-      <h4>{trackCount}</h4>
+      /> */}
       <TableViewLinkList links={links} onDelete={handleDeleteLink} />
       <div
         style={{
@@ -90,6 +95,7 @@ const AddLinks = ({
           Add Link
         </button>
       </div>
+      <HorizontalSeparator />
       <div
         style={{
           width: 435,
