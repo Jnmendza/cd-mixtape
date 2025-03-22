@@ -1,4 +1,8 @@
-const CdPlayerShell = () => {
+interface CdPlayerProps {
+  cdTitle: string;
+}
+
+const CdPlayerShell = ({ cdTitle }: CdPlayerProps) => {
   const isPlaying = false;
   return (
     <div
@@ -16,12 +20,8 @@ const CdPlayerShell = () => {
       }}
     >
       <style>
-        {`
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `}
+        {`@keyframes spin {0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }}`}
       </style>
 
       {/* See-through CD window */}
@@ -56,6 +56,25 @@ const CdPlayerShell = () => {
             animationPlayState: isPlaying ? "running" : "paused",
           }}
         >
+          <div
+            style={{
+              position: "absolute",
+              top: "20%",
+              left: "25%",
+              fontSize: "20px",
+              color: "#222",
+              fontFamily: "Permanent Marker",
+              fontWeight: 400,
+              fontStyle: "normal",
+              padding: "2px 6px",
+              borderRadius: "4px",
+              transform: "rotate(-15deg)", // gives it a real printed label vibe
+              userSelect: "none",
+              pointerEvents: "none",
+            }}
+          >
+            My Mix 2001
+          </div>
           {/* Simulated ::before pseudo-element */}
           <div
             style={{
@@ -104,8 +123,8 @@ const CdPlayerShell = () => {
             border: "1px solid #444",
             borderRadius: "35px",
             color: "lime",
-            fontFamily: "monospace",
-            fontSize: "14px",
+            fontFamily: "Doto",
+            fontSize: "18px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
