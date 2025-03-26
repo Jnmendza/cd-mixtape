@@ -164,6 +164,19 @@ const CdPlayer = ({
         alignItems: "center",
       }}
     >
+      {[1, 2].map((i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            width: `${100 - i * 12}%`,
+            height: `${100 - i * 12}%`,
+            border: "1px solid black",
+            opacity: 0.15,
+            borderRadius: "50%",
+          }}
+        ></div>
+      ))}
       <style>
         {`@keyframes spin {0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }}`}
@@ -261,7 +274,7 @@ const CdPlayer = ({
         <div
           style={{
             position: "absolute",
-            top: "40%",
+            top: "35%",
             width: "100%",
             height: "120px", // ⬆️ give more vertical space
             backgroundColor: "rgba(20, 20, 20, 1)",
@@ -280,7 +293,7 @@ const CdPlayer = ({
           }}
         >
           <CdTrackDisplay
-            trackTitle={videoTitle || "No Track"}
+            trackTitle={videoTitle}
             isLoading={!playerRef}
             count={count}
             trackTime={time}
@@ -322,15 +335,15 @@ const CdPlayer = ({
       <p
         style={{
           position: "absolute",
-          bottom: "15px",
-          fontSize: "12px",
+          bottom: "20px",
+          fontSize: "20px",
           color: "#333",
-          fontFamily: "sans-serif",
+          fontFamily: "Kdam Thmor Pro",
           pointerEvents: "none",
           userSelect: "none",
         }}
       >
-        CD Player
+        DiscMan
       </p>
     </div>
   );

@@ -59,15 +59,17 @@ const AddLinks = ({
         alt='burn-your-cd'
         style={{ height: 250, width: 475, marginBottom: 10 }}
       />
-
-      <input
-        type='text'
-        value={cdTitle}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setCdTitle(e.target.value)
-        }
-        placeholder='CD Title'
-      />
+      <div>
+        <input
+          type='text'
+          value={cdTitle}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setCdTitle(e.target.value)
+          }
+          placeholder='CD Title'
+        />
+        <p>Type your CD Title</p>
+      </div>
 
       <TableViewLinkList links={links} onDelete={handleDeleteLink} />
       <div

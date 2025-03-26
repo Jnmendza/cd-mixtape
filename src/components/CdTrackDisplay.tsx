@@ -60,15 +60,6 @@ const CdTrackDisplay = ({
           >
             <p>Track: {count}</p>
             <p>{trackTime}</p>
-            {/* <p
-              style={{
-                border: "1px solid rgba(0, 255, 0, 0.5)",
-                borderRadius: "10px",
-                padding: "0 4px",
-              }}
-            >
-              Aux
-            </p> */}
           </div>
 
           {/* Scrolling track title underneath */}
@@ -77,7 +68,7 @@ const CdTrackDisplay = ({
             animate={{ x: "-100%" }}
             transition={{
               repeat: Infinity,
-              duration: 8,
+              duration: 10,
               ease: "linear",
             }}
             style={{
