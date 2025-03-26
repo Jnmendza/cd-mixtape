@@ -1,11 +1,11 @@
-import React, { useState, useRef } from "react";
-import { YouTubePlayer } from "react-youtube";
 import "98.css";
-import GuiContainer from "./components/GuiContainer";
 import Footer from "./components/Footer";
 import AddLinks from "./components/AddLinks";
-import { AnimatePresence, motion } from "motion/react";
 import CdPlayer from "./components/CdPlayer";
+import { YouTubePlayer } from "react-youtube";
+import React, { useState, useRef } from "react";
+import GuiContainer from "./components/GuiContainer";
+import { AnimatePresence, motion } from "motion/react";
 
 const App: React.FC = () => {
   // Strings
@@ -14,15 +14,15 @@ const App: React.FC = () => {
   const [newLink, setNewLink] = useState<string>("");
 
   // Booleans
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPlayer, setShowPlayer] = useState<boolean>(false);
   const [startProgress, setStartProgress] = useState<boolean>(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   // Numbers
-  const [currentTrack, setCurrentTrack] = useState<number>(0);
   const [volume, setVolume] = useState<number>(100);
+  const [currentTrack, setCurrentTrack] = useState<number>(0);
 
   const playerRef = useRef<YouTubePlayer | null>(null);
 

@@ -1,4 +1,4 @@
-import React, { useState, CSSProperties } from "react";
+import React, { useState } from "react";
 import YouTube, { YouTubePlayer, YouTubeProps } from "react-youtube";
 import CdTrackDisplay from "./CdTrackDisplay";
 import { formatTime, youtubeRegex } from "../utils";
@@ -6,28 +6,28 @@ import InteractiveButton from "./InteractiveButton";
 interface CdPlayerProps {
   cdTitle: string;
   links: string[];
-  currentTrack: number;
-  setCurrentTrack: React.Dispatch<React.SetStateAction<number>>;
-  playerRef: YouTubePlayer | null;
   isPlaying: boolean;
+  currentTrack: number;
+  playerRef: YouTubePlayer | null;
   setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
   setShowPlayer: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentTrack: React.Dispatch<React.SetStateAction<number>>;
   setStartProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CdPlayer = ({
-  cdTitle,
   links,
-  currentTrack,
-  setCurrentTrack,
+  cdTitle,
   playerRef,
-  isPlaying = false,
   setIsPlaying,
+  currentTrack,
   setShowPlayer,
+  setCurrentTrack,
   setStartProgress,
+  isPlaying = false,
 }: CdPlayerProps) => {
-  const [videoTitle, setVideoTitle] = useState<string>("");
   const [duration, setDuration] = useState<number>(0);
+  const [videoTitle, setVideoTitle] = useState<string>("");
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const count = `${currentTrack + 1}/${links.filter((l) => l).length}`;
