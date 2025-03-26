@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [showPlayer, setShowPlayer] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
   const [startProgress, setStartProgress] = useState<boolean>(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState<boolean>(false);
 
@@ -62,11 +63,11 @@ const App: React.FC = () => {
             color: "white",
             marginTop: "4px",
             fontSize: "12px",
-            userSelect: "none", // Prevents text selection
+            userSelect: "none",
             padding: "2px 6px",
             borderRadius: "2px",
             textAlign: "center",
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Mimics Windows 98 text box
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
           }}
         >
           Media Player
@@ -87,7 +88,11 @@ const App: React.FC = () => {
             }}
           >
             {!showPlayer ? (
-              <GuiContainer setIsVisible={setIsVisible}>
+              <GuiContainer
+                isMinimized={isMinimized}
+                setIsVisible={setIsVisible}
+                setIsMinimized={setIsMinimized}
+              >
                 <AddLinks
                   links={links}
                   newLink={newLink}
@@ -119,7 +124,12 @@ const App: React.FC = () => {
       </AnimatePresence>
       <Footer
         volume={volume}
+        isVisible={isVisible}
+        isMinimized={isMinimized}
+        showPlayer={showPlayer}
         showVolumeSlider={showVolumeSlider}
+        setIsVisible={setIsVisible}
+        setIsMinimized={setIsMinimized}
         handleVolumeChange={handleVolumeChange}
         setShowVolumeSlider={setShowVolumeSlider}
       />

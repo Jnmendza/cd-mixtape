@@ -4,19 +4,29 @@ import VerticalSeparator from "./VerticalSeparator";
 import HelpWindow from "./HelpWindow";
 
 interface FooterProps {
-  showVolumeSlider: boolean;
   volume: number;
+  isVisible: boolean;
+  showPlayer: boolean;
+  isMinimized: boolean;
+  showVolumeSlider: boolean;
   handleVolumeChange: (value: number) => void;
-  setShowVolumeSlider: React.Dispatch<React.SetStateAction<boolean>>; // Fix here
+  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMinimized: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowVolumeSlider: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Footer: React.FC<FooterProps> = ({
-  showVolumeSlider,
   volume,
+  isVisible,
+  showPlayer,
+  isMinimized,
+  showVolumeSlider,
+  setIsVisible,
+  setIsMinimized,
   handleVolumeChange,
   setShowVolumeSlider,
 }) => {
-  const [showHelp, setshowHelp] = useState(false);
+  const [showHelp, setshowHelp] = useState<boolean>(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -58,7 +68,27 @@ const Footer: React.FC<FooterProps> = ({
           <p className='status-bar-field'>Press F1 for help</p>
           {showHelp && <HelpWindow onClose={() => setshowHelp(false)} />}
           <VerticalSeparator />
-          <p className='status-bar-field'>Slide 1</p>
+
+          <button
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              padding: "0 4px",
+              visibility: isMinimized && !isVisible ? "visible" : "hidden",
+            }}
+            onClick={() => {
+              setIsMinimized(false);
+              setIsVisible(true);
+            }}
+          >
+            <img
+              src='https://win98icons.alexmeub.com/icons/png/cd_audio_cd_a-0.png'
+              alt='cd-icon'
+              style={{ width: 21, height: 21, marginRight: 4 }}
+            />
+            Burn your CD
+          </button>
         </div>
 
         {/* Right-aligned content (Speaker + Time) */}
@@ -71,20 +101,27 @@ const Footer: React.FC<FooterProps> = ({
           }}
         >
           <VerticalSeparator />
-          <img
-            src='https://win98icons.alexmeub.com/icons/png/loudspeaker_rays-1.png'
-            alt='speaker'
-            style={{ width: 16, height: 16, marginRight: 4, cursor: "pointer" }}
-            onClick={() => handleVolumeChange(volume === 0 ? 100 : 0)} // Toggle mute on left-click
-            onContextMenu={(e) => {
-              e.preventDefault();
-              setShowVolumeSlider((prev) => !prev); // Right-click to show slider
-            }}
-          />
+          {showPlayer && (
+            <img
+              src='https://win98icons.alexmeub.com/icons/png/loudspeaker_rays-1.png'
+              alt='speaker'
+              style={{
+                width: 16,
+                height: 16,
+                marginRight: 4,
+                cursor: "pointer",
+              }}
+              onClick={() => handleVolumeChange(volume === 0 ? 100 : 0)} // Toggle mute on left-click
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setShowVolumeSlider((prev) => !prev); // Right-click to show slider
+              }}
+            />
+          )}
           <p className='status-bar-field'>{getCurrentTime()}</p>
 
           {/* Volume Slider (Only Shows When Right-Clicked) */}
-          {showVolumeSlider && (
+          {showVolumeSlider && showPlayer ? (
             <div
               style={{
                 position: "absolute",
@@ -104,11 +141,11 @@ const Footer: React.FC<FooterProps> = ({
                 value={volume}
                 onChange={(e) =>
                   handleVolumeChange(parseInt(e.target.value, 10))
-                } // Real-time volume update
+                }
                 style={{ width: "100px" }}
               />
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </footer>

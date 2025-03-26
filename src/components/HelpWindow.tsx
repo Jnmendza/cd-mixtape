@@ -3,7 +3,6 @@ const HelpWindow = ({ onClose }: { onClose: () => void }) => {
     "Open the Media Player",
     "Add YouTube links",
     "Burn your CD",
-    "Right click on the speaker icon at the bottom of the screen",
   ];
   return (
     <div
