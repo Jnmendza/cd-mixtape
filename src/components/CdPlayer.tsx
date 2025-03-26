@@ -1,5 +1,153 @@
-const CdPlayerShell = () => {
-  const isPlaying = false;
+import React, { useState } from "react";
+import YouTube, { YouTubePlayer, YouTubeProps } from "react-youtube";
+import CdTrackDisplay from "./CdTrackDisplay";
+import { formatTime, youtubeRegex } from "../utils";
+import InteractiveButton from "./InteractiveButton";
+interface CdPlayerProps {
+  cdTitle: string;
+  links: string[];
+  isPlaying: boolean;
+  currentTrack: number;
+  playerRef: YouTubePlayer | null;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowPlayer: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentTrack: React.Dispatch<React.SetStateAction<number>>;
+  setStartProgress: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const CdPlayer = ({
+  links,
+  cdTitle,
+  playerRef,
+  setIsPlaying,
+  currentTrack,
+  setShowPlayer,
+  setCurrentTrack,
+  setStartProgress,
+  isPlaying = false,
+}: CdPlayerProps) => {
+  const [duration, setDuration] = useState<number>(0);
+  const [videoTitle, setVideoTitle] = useState<string>("");
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  const count = `${currentTrack + 1}/${links.filter((l) => l).length}`;
+  const opts: YouTubeProps["opts"] = {
+    height: "0",
+    width: "0",
+    playerVars: {
+      autoplay: 0,
+    },
+  };
+
+  const time = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+
+  const getVideoId = (url: string): string => {
+    const match = url.match(youtubeRegex);
+    return match ? match[1] : "";
+  };
+
+  const nextTrack = () => {
+    const validTracks = links?.filter((l) => l).length;
+    const nextIndex = (currentTrack + 1) % validTracks;
+    setCurrentTrack(nextIndex);
+    if (playerRef.current) {
+      const nextVideoId = getVideoId(links[nextIndex]);
+      playerRef.current.loadVideoById(nextVideoId);
+      setIsPlaying(true);
+    } else {
+      console.log("Player not ready for next track");
+    }
+  };
+
+  const prevTrack = () => {
+    const validTracks = links.filter((l) => l).length;
+    const prevIndex = (currentTrack - 1 + validTracks) % validTracks;
+    setCurrentTrack(prevIndex);
+    if (playerRef.current) {
+      const prevVideoId = getVideoId(links[prevIndex]);
+      playerRef.current.loadVideoById(prevVideoId);
+      setIsPlaying(true);
+    } else {
+      console.log("Player not ready for prev track");
+    }
+  };
+
+  const playPause = () => {
+    if (!playerRef.current) {
+      console.log("Player not ready");
+      return;
+    }
+    const playerState = playerRef.current.getPlayerState();
+    if (playerState === 1) {
+      playerRef.current.pauseVideo();
+      setIsPlaying(false);
+    } else {
+      playerRef.current.playVideo();
+      setIsPlaying(true);
+    }
+  };
+
+  const onPlayerReady = (event: { target: YouTubePlayer }) => {
+    playerRef.current = event.target;
+
+    const initialVideoId = getVideoId(links[currentTrack]);
+    if (initialVideoId) {
+      event.target.loadVideoById(initialVideoId);
+      event.target.pauseVideo(); // Pause so it doesn't autoplay
+    }
+  };
+
+  const onStateChange = (event: { target: YouTubePlayer; data: number }) => {
+    const player = event.target;
+    const state = event.data;
+
+    console.log("Player state:", state);
+
+    if (state === 0) {
+      console.log("Track ended, moving to next");
+      nextTrack();
+    } else if (state === 1) {
+      // Video started playing
+      setIsPlaying(true);
+
+      // Fetch title when playback starts
+      const videoData = player.getVideoData();
+      if (videoData?.title) {
+        setVideoTitle(videoData.title);
+      }
+
+      // Fetch total duration of the video
+      const videoDuration = player.getDuration();
+      if (videoDuration) {
+        setDuration(videoDuration);
+      }
+
+      // Start polling current time every second
+      if (!intervalId) {
+        const id = setInterval(() => {
+          if (playerRef.current) {
+            setCurrentTime(playerRef.current.getCurrentTime());
+          }
+        }, 1000); // Update every second
+        setIntervalId(id);
+      }
+    } else if (state === 2) {
+      // Video paused
+      setIsPlaying(false);
+      if (intervalId) {
+        clearInterval(intervalId);
+        setIntervalId(null);
+      }
+    }
+
+    if (state === 0 || state === 2) {
+      if (intervalId) {
+        clearInterval(intervalId);
+        setIntervalId(null);
+      }
+    }
+  };
+
   return (
     <div
       style={{
@@ -11,19 +159,15 @@ const CdPlayerShell = () => {
         boxShadow: "inset -8px -8px 12px #bbb, inset 8px 8px 12px #888",
         border: "4px solid #666",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
       }}
     >
       <style>
-        {`
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  `}
+        {`@keyframes spin {0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }}`}
       </style>
-
       {/* See-through CD window */}
       <div
         style={{
@@ -56,6 +200,25 @@ const CdPlayerShell = () => {
             animationPlayState: isPlaying ? "running" : "paused",
           }}
         >
+          <div
+            style={{
+              position: "absolute",
+              top: "20%",
+              left: "25%",
+              fontSize: "20px",
+              color: "#222",
+              fontFamily: "Permanent Marker",
+              fontWeight: 400,
+              fontStyle: "normal",
+              padding: "2px 6px",
+              borderRadius: "4px",
+              transform: "rotate(-15deg)", // gives it a real printed label vibe
+              userSelect: "none",
+              pointerEvents: "none",
+            }}
+          >
+            {cdTitle}
+          </div>
           {/* Simulated ::before pseudo-element */}
           <div
             style={{
@@ -98,25 +261,79 @@ const CdPlayerShell = () => {
         <div
           style={{
             position: "absolute",
+            top: "40%",
             width: "100%",
-            height: "90px",
+            height: "120px", // ⬆️ give more vertical space
             backgroundColor: "rgba(20, 20, 20, 1)",
             border: "1px solid #444",
             borderRadius: "35px",
             color: "lime",
-            fontFamily: "monospace",
-            fontSize: "14px",
+            fontFamily: "Doto",
+            fontSize: "18px",
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            padding: "10px", // ⬅️ give internal padding
+            boxSizing: "border-box",
             zIndex: 2,
           }}
         >
-          Track Info
+          <CdTrackDisplay
+            trackTitle={videoTitle || "No Track"}
+            isLoading={!playerRef}
+            count={count}
+            trackTime={time}
+          />
+
+          <div
+            style={{
+              marginTop: 8,
+              display: "flex",
+              gap: "10px",
+              justifyContent: "center",
+              alignItems: "center",
+              overflow: "hidden", // ⬅️ prevent spill
+              width: "fit-content", // ⬅️ use full width of pill
+              maxWidth: "100%", // ⬅️ contain within the pill visually
+            }}
+          >
+            <InteractiveButton
+              onClick={() => {
+                setShowPlayer(false);
+                setStartProgress(false);
+              }}
+            >
+              Edit Tracks
+            </InteractiveButton>
+            <InteractiveButton onClick={prevTrack}>⏮</InteractiveButton>
+            <InteractiveButton onClick={playPause}>
+              {isPlaying ? "⏸" : "▶"}
+            </InteractiveButton>
+            <InteractiveButton onClick={nextTrack}>⏭</InteractiveButton>
+          </div>
+          <YouTube
+            opts={opts}
+            onReady={onPlayerReady}
+            onStateChange={onStateChange}
+          />
         </div>
       </div>
+      <p
+        style={{
+          position: "absolute",
+          bottom: "15px",
+          fontSize: "12px",
+          color: "#333",
+          fontFamily: "sans-serif",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      >
+        CD Player
+      </p>
     </div>
   );
 };
 
-export default CdPlayerShell;
+export default CdPlayer;

@@ -1,4 +1,10 @@
 const HelpWindow = ({ onClose }: { onClose: () => void }) => {
+  const lineItems = [
+    "Open the Media Player",
+    "Add YouTube links",
+    "Burn your CD",
+    "Right click on the speaker icon at the bottom of the screen",
+  ];
   return (
     <div
       className='window'
@@ -22,9 +28,9 @@ const HelpWindow = ({ onClose }: { onClose: () => void }) => {
       {/* Window Body */}
       <div className='window-body'>
         <ul>
-          <li>Add YouTube links</li>
-          <li>Burn your CD</li>
-          <li>Right click on the speaker icon at the bottom of the screen</li>
+          {lineItems.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
         </ul>
       </div>
     </div>
