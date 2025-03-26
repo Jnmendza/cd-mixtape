@@ -25,7 +25,7 @@ const HelpWindow = ({ onClose }: { onClose: () => void }) => {
       </div>
 
       {/* Window Body */}
-      <div className='window-body'>
+      <div className='window-body' style={{ padding: "8px" }}>
         <ul>
           {lineItems.map((item, index) => (
             <li key={index}>{item}</li>
