@@ -27,7 +27,7 @@ const Footer: React.FC<FooterProps> = ({
   setShowVolumeSlider,
 }) => {
   const [showHelp, setshowHelp] = useState<boolean>(false);
-
+  const [tooltipVisible, setTooltipVisible] = useState<boolean>(false);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "F1") {
@@ -101,23 +101,47 @@ const Footer: React.FC<FooterProps> = ({
           }}
         >
           <VerticalSeparator />
-          {showPlayer && (
-            <img
-              src='https://win98icons.alexmeub.com/icons/png/loudspeaker_rays-1.png'
-              alt='speaker'
-              style={{
-                width: 16,
-                height: 16,
-                marginRight: 4,
-                cursor: "pointer",
-              }}
-              onClick={() => handleVolumeChange(volume === 0 ? 100 : 0)} // Toggle mute on left-click
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setShowVolumeSlider((prev) => !prev); // Right-click to show slider
-              }}
-            />
-          )}
+          <div style={{ position: "relative", display: "inline-block" }}>
+            {showPlayer && (
+              <img
+                src='https://win98icons.alexmeub.com/icons/png/loudspeaker_rays-1.png'
+                alt='speaker'
+                style={{
+                  width: 16,
+                  height: 16,
+                  marginRight: 4,
+                  cursor: "pointer",
+                }}
+                onClick={() => handleVolumeChange(volume === 0 ? 100 : 0)} // Toggle mute on left-click
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setShowVolumeSlider((prev) => !prev); // Right-click to show slider
+                }}
+                onMouseEnter={() => setTooltipVisible(true)}
+                onMouseLeave={() => setTooltipVisible(false)}
+              />
+            )}
+            {showPlayer && tooltipVisible && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "125%",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  background: "#222",
+                  color: "#fff",
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  fontSize: 12,
+                  whiteSpace: "nowrap",
+                  zIndex: 10,
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                }}
+              >
+                Right click for volume!
+              </div>
+            )}
+          </div>
           <p className='status-bar-field'>{getCurrentTime()}</p>
 
           {/* Volume Slider (Only Shows When Right-Clicked) */}
